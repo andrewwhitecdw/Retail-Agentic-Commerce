@@ -176,7 +176,6 @@ class PostPurchaseAgentClient:
                 response = await client.post(
                     f"{self.base_url}/generate",
                     json={"input_message": json.dumps(request)},
-                    headers={"Content-Type": "application/json"},
                 )
 
                 if response.status_code != 200:
