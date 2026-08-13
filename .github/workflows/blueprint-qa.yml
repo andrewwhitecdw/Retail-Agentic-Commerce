@@ -137,8 +137,7 @@ jobs:
           SMTP_MAIL_TO: ${{ secrets.SMTP_MAIL_TO }}
           SMTP_MAIL_FROM: ${{ secrets.SMTP_MAIL_FROM }}
         run: |
-          [ -n "${SMTP_USERNAME:-}${SMTP_PASSWORD:-}${SMTP_MAIL_TO:-}${SMTP_MAIL_FROM:-}" ] \
-            && [ -n "${SMTP_USERNAME:-}" ] && [ -n "${SMTP_PASSWORD:-}" ] \
+          [ -n "${SMTP_USERNAME:-}" ] && [ -n "${SMTP_PASSWORD:-}" ] \
             && [ -n "${SMTP_MAIL_TO:-}" ] && [ -n "${SMTP_MAIL_FROM:-}" ] \
             && echo "enabled=true" >> "$GITHUB_OUTPUT" \
             || echo "enabled=false" >> "$GITHUB_OUTPUT"
