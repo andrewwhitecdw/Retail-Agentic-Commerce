@@ -166,7 +166,7 @@ ok "Docker infrastructure containers started"
 # Wait for Milvus to be healthy
 info "Waiting for Milvus to be healthy..."
 MILVUS_READY=false
-for attempt in $(seq 1 30); do
+for attempt in {1..30}; do
     if curl -sf "http://localhost:9091/healthz" -o /dev/null --max-time 5 2>/dev/null; then
         MILVUS_READY=true
         break
@@ -176,7 +176,7 @@ for attempt in $(seq 1 30); do
 done
 printf "\n"
 
-if $MILVUS_READY; then
+if [ "$MILVUS_READY" = true ]; then
     ok "Milvus is healthy (localhost:19530)"
 else
     warn "Milvus did not become healthy within timeout — agents may fail to connect"
@@ -236,11 +236,11 @@ NAT_ENV_VARS=(
     PHOENIX_ENDPOINT
 )
 
-AGENT_ENV=""
+AGENT_ENV=()
 for var in "${NAT_ENV_VARS[@]}"; do
     val="${!var:-}"
     if [ -n "$val" ]; then
-        AGENT_ENV="$AGENT_ENV $var=$val"
+        AGENT_ENV+=("$var=$val")
     fi
 done
 
@@ -249,9 +249,9 @@ mkdir -p "$LOG_DIR"
 # =============================================================================
 # 7. Seed Milvus vector database with product embeddings
 # =============================================================================
-if $MILVUS_READY; then
+if [ "$MILVUS_READY" = true ]; then
     info "Seeding Milvus with product catalog embeddings..."
-    if env $AGENT_ENV "$AGENTS_VENV/bin/python" "$AGENTS_DIR/scripts/seed_milvus.py" > "$LOG_DIR/milvus-seeder.log" 2>&1; then
+    if env "${AGENT_ENV[@]}" "$AGENTS_VENV/bin/python" "$AGENTS_DIR/scripts/seed_milvus.py" > "$LOG_DIR/milvus-seeder.log" 2>&1; then
         ok "Milvus seeded with product embeddings (see logs/milvus-seeder.log)"
     else
         warn "Milvus seeding failed — check logs/milvus-seeder.log for details"
@@ -303,7 +303,7 @@ start_agent() {
     local config="$3"
     local logfile="$LOG_DIR/$name.log"
     cd "$AGENTS_DIR"
-    env $AGENT_ENV "$AGENTS_VENV/bin/nat" serve --config_file "configs/$config" --port "$port" > "$logfile" 2>&1 &
+    env "${AGENT_ENV[@]}" "$AGENTS_VENV/bin/nat" serve --config_file "configs/$config" --port "$port" > "$logfile" 2>&1 &
     local pid=$!
     echo "$pid:$name" >> "$PID_FILE"
     SVC_NAMES+=("$name")
@@ -381,7 +381,7 @@ done
 # 10. Summary
 # =============================================================================
 printf "\n"
-if $ALL_HEALTHY; then
+if [ "$ALL_HEALTHY" = true ]; then
     printf "${GREEN}${BOLD}All services are running!${NC}\n"
 else
     printf "${YELLOW}${BOLD}Some services failed health checks. Check logs for details.${NC}\n"
