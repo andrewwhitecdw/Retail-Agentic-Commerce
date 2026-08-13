@@ -662,14 +662,14 @@ class TestGetPromotionsForProducts:
         mock_session.exec.return_value.all.return_value = []
 
         mock_client = MagicMock(spec=PromotionAgentClient)
-        mock_client.get_promotion_decision = AsyncMock(
-            side_effect=Exception("Test error")
-        )
 
-        # Patch the get_promotion_for_product to raise an exception
+        async def failing_get_promotion(*args, **kwargs):
+            raise Exception("Test error")
+
+        # Patch the async get_promotion_for_product to raise inside the coroutine
         with patch(
             "src.merchant.services.promotion.get_promotion_for_product",
-            side_effect=Exception("Test error"),
+            side_effect=failing_get_promotion,
         ):
             results = await get_promotions_for_products(
                 mock_session, products, mock_client
