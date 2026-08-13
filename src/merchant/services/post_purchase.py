@@ -325,6 +325,7 @@ FALLBACK_TEMPLATES: dict[str, dict[str, dict[str, str]]] = {
 
 
 def format_order_items(items: list[OrderItem]) -> str:
+    """Format order items as a human-readable string."""
     if not items:
         return ""
     return ", ".join(f"{item['name']} (x{item['quantity']})" for item in items)
