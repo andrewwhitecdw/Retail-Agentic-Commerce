@@ -506,6 +506,8 @@ async def generate_shipping_messages_batch(
     # Handle any exceptions by using fallback templates
     processed_results: list[ShippingMessageResponse] = []
     for i, result in enumerate(results):
+        if isinstance(result, asyncio.CancelledError):
+            raise result
         if isinstance(result, BaseException):
             logger.warning(
                 "Exception generating message for order %s: %s",
