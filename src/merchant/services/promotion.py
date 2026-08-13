@@ -442,7 +442,7 @@ def filter_allowed_actions_by_margin(min_margin: float) -> list[str]:
     allowed: list[str] = []
 
     for action, discount in ACTION_DISCOUNT_MAP.items():
-        if discount < max_discount:
+        if discount <= max_discount:
             allowed.append(action.value)
 
     # Always include NO_PROMO as fallback
