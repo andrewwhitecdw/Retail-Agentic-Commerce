@@ -334,7 +334,11 @@ def get_promotion_client(base_url: str, timeout: float = 10.0) -> PromotionAgent
         PromotionAgentClient instance.
     """
     global _default_client
-    if _default_client is None or _default_client.base_url != base_url:
+    if (
+        _default_client is None
+        or _default_client.base_url != base_url
+        or _default_client.timeout != timeout
+    ):
         _default_client = PromotionAgentClient(base_url, timeout)
     return _default_client
 
