@@ -82,6 +82,26 @@ jobs:
           docker compose -f docker-compose.infra.yml -f docker-compose.yml exec -T merchant \
             python - < .github/scripts/check_nat_agents.py
 
+
+          echo "Waiting for Milvus catalog seeding to finish (up to 10 min)..."
+          SEEDER_WAIT_STATUS=0
+          SEEDER_EXIT_CODE="$(timeout 600 docker wait milvus-seeder)" || SEEDER_WAIT_STATUS=$?
+          if [ "${SEEDER_WAIT_STATUS}" -eq 124 ]; then
+            echo "::error::Milvus catalog seeding did not finish within 10 minutes."
+            docker compose -f docker-compose.infra.yml -f docker-compose.yml logs --tail 200 milvus-seeder
+            exit 1
+          fi
+          if [ -z "${SEEDER_EXIT_CODE}" ]; then
+            echo "::error::Failed to retrieve Milvus seeder exit status (docker wait exited ${SEEDER_WAIT_STATUS})."
+            docker compose -f docker-compose.infra.yml -f docker-compose.yml logs --tail 200 milvus-seeder
+            exit 1
+          fi
+          if [ "${SEEDER_EXIT_CODE}" != "0" ]; then
+            echo "::error::Milvus catalog seeding failed with exit code ${SEEDER_EXIT_CODE}."
+            docker compose -f docker-compose.infra.yml -f docker-compose.yml logs --tail 200 milvus-seeder
+            exit 1
+          fi
+
       - name: Run UI automation tests
         env:
           TEST_DOCKER_PULL_KEY: ${{ secrets.TEST_DOCKER_PULL_KEY }}
