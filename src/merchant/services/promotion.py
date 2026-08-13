@@ -516,7 +516,11 @@ def compute_promotion_context(db: Session, product: Product) -> PromotionContext
         base_price_cents=product.base_price,
         stock_count=product.stock_count,
         min_margin=product.min_margin,
-        lowest_competitor_price_cents=lowest_competitor_price or product.base_price,
+        lowest_competitor_price_cents=(
+            lowest_competitor_price
+            if lowest_competitor_price is not None
+            else product.base_price
+        ),
         signals=signals,
         allowed_actions=allowed_actions,
     )
