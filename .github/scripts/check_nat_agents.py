@@ -87,7 +87,7 @@ def call_agent(
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 status = response.status
-                raw_response = response.read().decode()
+                raw_response = response.read().decode(errors="replace")
         except urllib.error.HTTPError as error:
             detail = error.read().decode(errors="replace")
             if attempt == 0 and is_retryable_empty_llm_response(error.code, detail):
