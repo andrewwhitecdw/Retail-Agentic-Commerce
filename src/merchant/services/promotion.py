@@ -603,9 +603,8 @@ def validate_discount_against_margin(
         True if discount is valid, False if it violates margin constraint.
     """
     final_price = base_price - discount
-    min_allowed_price = int(base_price * min_margin)
 
-    return final_price >= min_allowed_price
+    return final_price >= base_price * min_margin
 
 
 # =============================================================================
