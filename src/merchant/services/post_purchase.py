@@ -470,6 +470,10 @@ async def generate_shipping_message(
             return get_fallback_message(request)
 
         return response
+    except asyncio.CancelledError:
+        status = "cancelled"
+        error_code = "request_cancelled"
+        raise
     except Exception:
         status = "error_internal"
         error_code = "internal_exception"
