@@ -236,11 +236,11 @@ NAT_ENV_VARS=(
     PHOENIX_ENDPOINT
 )
 
-AGENT_ENV=""
+AGENT_ENV=()
 for var in "${NAT_ENV_VARS[@]}"; do
     val="${!var:-}"
     if [ -n "$val" ]; then
-        AGENT_ENV="$AGENT_ENV $var=$val"
+        AGENT_ENV+=("$var=$val")
     fi
 done
 
@@ -251,7 +251,7 @@ mkdir -p "$LOG_DIR"
 # =============================================================================
 if $MILVUS_READY; then
     info "Seeding Milvus with product catalog embeddings..."
-    if env $AGENT_ENV "$AGENTS_VENV/bin/python" "$AGENTS_DIR/scripts/seed_milvus.py" > "$LOG_DIR/milvus-seeder.log" 2>&1; then
+    if env "${AGENT_ENV[@]}" "$AGENTS_VENV/bin/python" "$AGENTS_DIR/scripts/seed_milvus.py" > "$LOG_DIR/milvus-seeder.log" 2>&1; then
         ok "Milvus seeded with product embeddings (see logs/milvus-seeder.log)"
     else
         warn "Milvus seeding failed — check logs/milvus-seeder.log for details"
@@ -303,7 +303,7 @@ start_agent() {
     local config="$3"
     local logfile="$LOG_DIR/$name.log"
     cd "$AGENTS_DIR"
-    env $AGENT_ENV "$AGENTS_VENV/bin/nat" serve --config_file "configs/$config" --port "$port" > "$logfile" 2>&1 &
+    env "${AGENT_ENV[@]}" "$AGENTS_VENV/bin/nat" serve --config_file "configs/$config" --port "$port" > "$logfile" 2>&1 &
     local pid=$!
     echo "$pid:$name" >> "$PID_FILE"
     SVC_NAMES+=("$name")
