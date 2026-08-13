@@ -662,10 +662,6 @@ class TestGetPromotionsForProducts:
         mock_session.exec.return_value.all.return_value = []
 
         mock_client = MagicMock(spec=PromotionAgentClient)
-        mock_client.get_promotion_decision = AsyncMock(
-            side_effect=Exception("Test error")
-        )
-
         # Patch the get_promotion_for_product to raise an exception
         with patch(
             "src.merchant.services.promotion.get_promotion_for_product",
