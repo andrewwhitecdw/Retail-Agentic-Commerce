@@ -164,15 +164,18 @@ class TestFilterAllowedActionsByMargin:
         assert PromotionAction.DISCOUNT_15_PCT.value in result
         assert PromotionAction.FREE_SHIPPING.value in result
 
-    def test_medium_margin_excludes_large_discounts(self) -> None:
-        """Medium min_margin (0.10) excludes 15% discount."""
+    def test_medium_margin_allows_standard_discounts(self) -> None:
+        """Medium min_margin (0.10) allows all standard discounts.
+
+        max_discount = 1 - min_margin = 1 - 0.10 = 0.90, so all
+        standard discounts (5%, 10%, 15%) and free shipping are allowed.
+        """
         result = filter_allowed_actions_by_margin(0.10)
         assert PromotionAction.NO_PROMO.value in result
+        assert PromotionAction.FREE_SHIPPING.value in result
         assert PromotionAction.DISCOUNT_5_PCT.value in result
-        # 10% discount is still allowed (discount <= 1 - 0.10 = 0.90)
         assert PromotionAction.DISCOUNT_10_PCT.value in result
-        # But 15% may be excluded depending on exact math
-        # discount <= (1 - min_margin) means 0.15 <= 0.90, so still allowed
+        assert PromotionAction.DISCOUNT_15_PCT.value in result
 
     def test_very_high_margin_excludes_large_discounts(self) -> None:
         """Very high min_margin (0.90) excludes 10%+ discounts.
