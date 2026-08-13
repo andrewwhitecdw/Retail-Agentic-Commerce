@@ -503,16 +503,18 @@ async def generate_shipping_messages_batch(
     tasks = [generate_shipping_message(req, client) for req in requests]
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    # Handle any exceptions by using fallback templates
+    # Handle task exceptions by using fallback templates; let base exceptions propagate.
     processed_results: list[ShippingMessageResponse] = []
     for i, result in enumerate(results):
-        if isinstance(result, BaseException):
+        if isinstance(result, Exception):
             logger.warning(
                 "Exception generating message for order %s: %s",
                 requests[i]["order"]["order_id"],
                 result,
             )
             processed_results.append(get_fallback_message(requests[i]))
+        elif isinstance(result, BaseException):
+            raise result
         else:
             processed_results.append(result)
 
