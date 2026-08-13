@@ -10,6 +10,7 @@ name = "acp-agents"
 version = "0.1.0"
 description = "NAT Agents for Agentic Commerce Protocol - Promotion and Post-Purchase agents"
 readme = "README.md"
+license = {text = "Apache-2.0"}
 requires-python = ">=3.12,<3.14"
 dependencies = [
     # NAT with RAG (Milvus retriever), LangChain, Phoenix, profiler, and Ragas extras
